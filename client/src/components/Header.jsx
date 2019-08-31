@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import React, { Component } from "react";
-import axios from 'axios'
 
 export default class Header extends Component {
   render() {
@@ -15,8 +14,9 @@ export default class Header extends Component {
   }
 
   handleLogInClick = () => {
-    console.log("env: " + process.env.REACT_APP_API_URL);
-    axios.get(process.env.REACT_APP_API_URL + "/").then(
-      response => console.log(response));
+    window.open(process.env.REACT_APP_API_URL + "/login/twitter", "_self");
+    // console.log("env: " + process.env.REACT_APP_API_URL);
+    // axios.get(process.env.REACT_APP_API_URL + "/").then(
+    //   response => console.log(response));
   };
 }
