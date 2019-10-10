@@ -7,6 +7,8 @@ var passport = require('passport');
 var TwitterStrategy = require('passport-twitter').Strategy;
 const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser"); // parse cookie header
+var mongoose = require('mongoose'),
+  Schema = mongoose.Schema;
 
 app.use(
   cors({
@@ -17,6 +19,53 @@ app.use(
 );
 
 console.log("twitter keys: " + process.env.TWITTER_CONSUMER_KEY + ", " + process.env.TWITTER_CONSUMER_SECRET);
+
+var db = mongoose.connect('mongodb://localhost:27017/twitter-demo', { 
+  useNewUrlParser: true, useUnifiedTopology: true});
+
+var UserSchema = new Schema({
+  email: {
+    type: String, required: true,
+    trim: true, unique: true,
+    match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+  },
+  twitterProvider: {
+    type: {
+      id: String,
+      token: String
+    },
+    select: false
+  }
+});
+
+UserSchema.statics.upsertTwitterUser = function(token, tokenSecret, profile, cb) {
+    var that = this;
+    return this.findOne({
+      'twitterProvider.id': profile.id
+    }, function(err, user) {
+      // no user was found, lets create a new one
+      if (!user) {
+        var newUser = new that({
+          email: profile.emails[0].value,
+          twitterProvider: {
+            id: profile.id,
+            token: token,
+            tokenSecret: tokenSecret
+          }
+        });
+
+        newUser.save(function(error, savedUser) {
+          if (error) {
+            console.log(error);
+          }
+          return cb(error, savedUser);
+        });
+      } else {
+        return cb(err, user);
+      }
+    });
+};
+
 passport.use(new TwitterStrategy({
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
