@@ -3,12 +3,15 @@ const express = require("express");
 const app = express();
 const port = 7000;
 const cors = require("cors");
-var passport = require('passport');
-var TwitterStrategy = require('passport-twitter').Strategy;
+const passport = require('passport');
+const TwitterStrategy = require('passport-twitter').Strategy;
+const GitHubStrategy = require('passport-github').Strategy;
 const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser"); // parse cookie header
-var mongoose = require('mongoose'),
-  Schema = mongoose.Schema;
+const mongoose = require('./mongoose');
+
+mongoose();
+const User = require('mongoose').model('User');
 
 app.use(
   cors({
@@ -20,60 +23,34 @@ app.use(
 
 console.log("twitter keys: " + process.env.TWITTER_CONSUMER_KEY + ", " + process.env.TWITTER_CONSUMER_SECRET);
 
-var db = mongoose.connect('mongodb://localhost:27017/twitter-demo', { 
-  useNewUrlParser: true, useUnifiedTopology: true});
-
-var UserSchema = new Schema({
-  email: {
-    type: String, required: true,
-    trim: true, unique: true,
-    match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
-  },
-  twitterProvider: {
-    type: {
-      id: String,
-      token: String
-    },
-    select: false
-  }
-});
-
-UserSchema.statics.upsertTwitterUser = function(token, tokenSecret, profile, cb) {
-    var that = this;
-    return this.findOne({
-      'twitterProvider.id': profile.id
-    }, function(err, user) {
-      // no user was found, lets create a new one
-      if (!user) {
-        var newUser = new that({
-          email: profile.emails[0].value,
-          twitterProvider: {
-            id: profile.id,
-            token: token,
-            tokenSecret: tokenSecret
-          }
-        });
-
-        newUser.save(function(error, savedUser) {
-          if (error) {
-            console.log(error);
-          }
-          return cb(error, savedUser);
-        });
-      } else {
-        return cb(err, user);
-      }
-    });
-};
-
 passport.use(new TwitterStrategy({
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+    includeEmail: true,
     callbackURL: "/auth/twitter/callback"
   },
   function(token, tokenSecret, profile, done) {
     console.log("======> twitterStrategy: " + JSON.stringify(profile._json));
-    done(null, null);
+    User.upsertTwitterUser(token, tokenSecret, profile, function(err, user) {
+        return done(err, user);
+      });
+    // done(null, null);
+  }
+));
+
+console.log("github keys: " + process.env.GITHUB_CLIENT_ID + ", " + process.env.GITHUB_CLIENT_SECRET);
+
+passport.use(new GitHubStrategy({
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    scope: 'user:email',
+    callbackURL: "/auth/github/callback"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    console.log("======> GitHubStrategy: " + JSON.stringify(profile._json));
+    User.upsertGithubUser(accessToken, refreshToken, profile, function(err, user) {
+        return cb(err, user);
+      });
   }
 ));
 
@@ -116,8 +93,17 @@ app.get("/oops", (req, res) => {
 app.get('/login/twitter',
   passport.authenticate('twitter'));
 
+app.get('/login/github',
+  passport.authenticate('github'));
+
 app.get('/auth/twitter/callback',
   passport.authenticate('twitter', { failureRedirect: '/oops' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+
+app.get('/auth/github/callback',
+  passport.authenticate('github', { failureRedirect: '/oops' }),
   function(req, res) {
     res.redirect('/');
   });

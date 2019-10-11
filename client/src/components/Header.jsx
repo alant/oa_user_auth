@@ -14,7 +14,7 @@ export default class Header extends Component {
   }
 
   handleLogInClick = () => {
-    window.open(process.env.REACT_APP_API_URL + "/login/twitter", "_self");
+    window.open(process.env.REACT_APP_API_URL + "/login/github", "_self");
     // console.log("env: " + process.env.REACT_APP_API_URL);
     // axios.get(process.env.REACT_APP_API_URL + "/").then(
     //   response => console.log(response));
