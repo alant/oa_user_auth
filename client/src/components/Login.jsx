@@ -1,8 +1,9 @@
 import React from "react";
 import { AuthContext } from "../App";
+import { Redirect } from "react-router-dom";
 
 function Login() {
-  const { dispatch } = React.useContext(AuthContext);
+  const { dispatch, state } = React.useContext(AuthContext);
   // const [data, setData] = React.useState(initialState);
   // const initialState = {
   //   email: "",
@@ -26,36 +27,40 @@ function Login() {
 
   return (
     <div className="login-container">
-      <div className="card">
-        <div className="container">
-          <form onSubmit={handleFormSubmit}>
-            <h1>Login</h1>
-			
-    		    <label htmlFor="email">
-              Email Address
-              <input
-                type="text"
-                name="email"
-                id="email"
-              />
-            </label>
-			
-    		    <label htmlFor="password">
-              Password
-              <input
-                type="password"
-                name="password"
-                id="password"
-              />
-            </label>
-			
-            <button>
-              Login
-            </button>
-          
-    	    </form>
+      {!state.isAuthenticated ?
+        <div className="card">
+          <div className="container">
+            <form onSubmit={handleFormSubmit}>
+              <h1>Login</h1>
+        
+              <label htmlFor="email">
+                Email Address
+                <input
+                  type="text"
+                  name="email"
+                  id="email"
+                />
+              </label>
+        
+              <label htmlFor="password">
+                Password
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                />
+              </label>
+        
+              <button>
+                Login
+              </button>
+            
+            </form>
+          </div>
         </div>
-      </div>
+        :
+        <Redirect to="/" />
+      }
     </div>
   );
 }

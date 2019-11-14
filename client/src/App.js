@@ -48,7 +48,7 @@ function App() {
         <Header/>
         <div>
           <Route exact path="/" component={Home} />
-          <PrivateRoute isAuthenticated="state.isAuthenticated" path="/profile" component={Profile} />
+          <PrivateRoute isAuthenticated={state.isAuthenticated} path="/profile" component={Profile} />
           <Route exact path="/login" component={Login} />
         </div>
       </Router>
