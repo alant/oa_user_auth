@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 
-import Header from "./Header";
-
 export default class Home extends Component {
   state = {
     user: {},
@@ -12,16 +10,13 @@ export default class Home extends Component {
     const { loggedIn } = this.state;
     return (
       <div>
-        <Header/>
-        <div>
-          {loggedIn ? (
-            <div>
-              <h2>Hello {this.state.user.name}!</h2>
-            </div>
-          ) : (
-            <h1>Welcome!</h1>
-          )}
-        </div>
+        {loggedIn ? (
+          <div>
+            <h2>Hello {this.state.user.name}!</h2>
+          </div>
+        ) : (
+          <h1>Welcome!</h1>
+        )}
       </div>
     );
   }
