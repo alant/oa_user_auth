@@ -48,7 +48,7 @@ function App() {
         <Header/>
         <div>
           <Route exact path="/" component={Home} />
-          <PrivateRoute path="/profile" component={Profile} />
+          <PrivateRoute isAuthenticated="state.isAuthenticated" path="/profile" component={Profile} />
           <Route exact path="/login" component={Login} />
         </div>
       </Router>
@@ -56,12 +56,12 @@ function App() {
   );
 }
 
-function PrivateRoute({ component: Component, ...rest }) {
+function PrivateRoute({ component: Component, isAuthenticated, ...rest }) {
   return (
     <Route
       {...rest}
       render={(props) =>
-        initialState.isAuthenticated ? (
+        isAuthenticated ? (
           <Component {...props} />
         ) : (
           <Redirect

@@ -1,11 +1,34 @@
 import React from "react";
+import { AuthContext } from "../App";
 
 function Login() {
+  const { dispatch } = React.useContext(AuthContext);
+  // const [data, setData] = React.useState(initialState);
+  // const initialState = {
+  //   email: "",
+  //   password: "",
+  //   // isSubmitting: false,
+  //   // errorMessage: null
+  // };
+
+  const handleFormSubmit = event => {
+    event.preventDefault();
+    // setData({
+    //   ...data,
+    //   // isSubmitting: true,
+    //   // errorMessage: null
+    // });
+    dispatch({
+        type: "LOGIN",
+        payload: {user: "abc", token: "def"}
+    });
+  };
+
   return (
     <div className="login-container">
       <div className="card">
         <div className="container">
-          <form>
+          <form onSubmit={handleFormSubmit}>
             <h1>Login</h1>
 			
     		    <label htmlFor="email">
