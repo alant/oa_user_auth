@@ -9,27 +9,27 @@ export const AuthContext = React.createContext();
 
 const initialState = {
   isAuthenticated: false,
-  // user: null,
-  // token: null,
+  user: null,
+  token: null,
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
-      // localStorage.setItem("user", JSON.stringify(action.payload.user));
-      // localStorage.setItem("token", JSON.stringify(action.payload.token));
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      localStorage.setItem("token", JSON.stringify(action.payload.token));
       return {
         ...state,
         isAuthenticated: true,
-        // user: action.payload.user,
-        // token: action.payload.token
+        user: action.payload.user,
+        token: action.payload.token
       };
     case "LOGOUT":
-      // localStorage.clear();
+      localStorage.clear();
       return {
         ...state,
         isAuthenticated: false,
-        // user: null
+        user: null
       };
     default:
       return state;
@@ -61,7 +61,7 @@ function PrivateRoute({ component: Component, ...rest }) {
     <Route
       {...rest}
       render={(props) =>
-        fakeAuth.isAuthenticated ? (
+        initialState.isAuthenticated ? (
           <Component {...props} />
         ) : (
           <Redirect
@@ -76,16 +76,16 @@ function PrivateRoute({ component: Component, ...rest }) {
   );
 }
 
-const fakeAuth = {
-  isAuthenticated: false,
-  authenticate(cb) {
-    fakeAuth.isAuthenticated = true;
-    setTimeout(cb, 100); // fake async
-  },
-  signout(cb) {
-    fakeAuth.isAuthenticated = false;
-    setTimeout(cb, 100);
-  }
-};
+// const fakeAuth = {
+//   isAuthenticated: false,
+//   authenticate(cb) {
+//     fakeAuth.isAuthenticated = true;
+//     setTimeout(cb, 100); // fake async
+//   },
+//   signout(cb) {
+//     fakeAuth.isAuthenticated = false;
+//     setTimeout(cb, 100);
+//   }
+// };
 
 export default App;
