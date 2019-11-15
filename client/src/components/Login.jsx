@@ -12,17 +12,18 @@ function Login() {
   //   // errorMessage: null
   // };
 
-  const handleFormSubmit = event => {
+  const handleLogin = event => {
     event.preventDefault();
+    window.open("http://localhost:7000/auth/github", "_self");
     // setData({
     //   ...data,
     //   // isSubmitting: true,
     //   // errorMessage: null
     // });
-    dispatch({
-        type: "LOGIN",
-        payload: {user: "abc", token: "def"}
-    });
+    // dispatch({
+    //     type: "LOGIN",
+    //     payload: {user: "abc", token: "def"}
+    // });
   };
 
   return (
@@ -30,32 +31,10 @@ function Login() {
       {!state.isAuthenticated ?
         <div className="card">
           <div className="container">
-            <form onSubmit={handleFormSubmit}>
               <h1>Login</h1>
-        
-              <label htmlFor="email">
-                Email Address
-                <input
-                  type="text"
-                  name="email"
-                  id="email"
-                />
-              </label>
-        
-              <label htmlFor="password">
-                Password
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                />
-              </label>
-        
-              <button>
-                Login
+              <button onClick={handleLogin}>
+                Login with github
               </button>
-            
-            </form>
           </div>
         </div>
         :

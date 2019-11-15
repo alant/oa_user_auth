@@ -44,7 +44,7 @@ passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
     scope: 'user:email',
-    callbackURL: "/auth/github/callback"
+    // callbackURL: "/auth/github/callback"
   },
   function(accessToken, refreshToken, profile, cb) {
     console.log("======> GitHubStrategy: " + JSON.stringify(profile._json));
@@ -93,7 +93,7 @@ app.get("/oops", (req, res) => {
 app.get('/login/twitter',
   passport.authenticate('twitter'));
 
-app.get('/login/github',
+app.get('/auth/github',
   passport.authenticate('github'));
 
 app.get('/auth/twitter/callback',
