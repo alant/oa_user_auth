@@ -9,9 +9,12 @@ const GitHubStrategy = require('passport-github').Strategy;
 const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser"); // parse cookie header
 const mongoose = require('./mongoose');
+const router = require("express").Router();
 
 mongoose();
 const User = require('mongoose').model('User');
+
+const CLIENT_HOME_PAGE_URL = "http://localhost:3000";
 
 app.use(
   cors({
@@ -50,7 +53,7 @@ passport.use(new GitHubStrategy({
     console.log("======> GitHubStrategy: " + JSON.stringify(profile._json));
     User.upsertGithubUser(accessToken, refreshToken, profile, function(err, user) {
         return cb(err, user);
-      });
+    });
   }
 ));
 
@@ -77,42 +80,64 @@ app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get("/", (req, res) => {
+// when login is successful, retrieve user info
+router.get("/login/success", (req, res) => {
+  if (req.user) {
+    res.json({
+      success: true,
+      message: "user has successfully authenticated",
+      user: req.user,
+      cookies: req.cookies
+    });
+  }
+});
+
+const authCheck = (req, res, next) => {
+  if (!req.user) {
+    res.status(401).json({
+      authenticated: false,
+      message: "user has not been authenticated"
+    });
+  } else {
+    next();
+  }
+};
+
+app.get("/", authCheck, (req, res) => {
   res.status(200).json({
-    message: "oh hello",
-    user: "alan"
+    authenticated: true,
+    message: "oh yea, user successfully authenticated",
+    user: req.user,
+    cookies: req.cookies
   });
 });
 
 app.get("/oops", (req, res) => {
-  res.status(200).json({
-    message: "oh no, failed"
+  res.status(401).json({
+    success: false,
+    message: "oh no, auth failed"
   });
 });
 
-app.get('/login/twitter',
-  passport.authenticate('twitter'));
+app.get('/login/twitter', passport.authenticate('twitter'));
+app.get('/auth/twitter/callback', passport.authenticate('twitter'));
 
-app.get('/auth/github',
-  passport.authenticate('github'));
-
-app.get('/auth/twitter/callback',
-  passport.authenticate('twitter', { failureRedirect: '/oops' }),
-  function(req, res) {
-    res.redirect('/');
-  });
-
+app.get('/auth/github', passport.authenticate('github'));
 app.get('/auth/github/callback',
-  passport.authenticate('github', { failureRedirect: '/oops' }),
-  function(req, res) {
-    res.redirect('/');
-  });
+  passport.authenticate('github', { 
+    // successRedirect: CLIENT_HOME_PAGE_URL,
+    failureRedirect: '/oops' , 
+        function(req, res) {
+        const token = req.user.token;
+        res.redirect(CLIENT_HOME_PAGE_URL + "?token=" + token);
+    }
+  })
+);
 
-app.get('/logout',
-  function(req, res){
-    req.session.destroy(function (err) {
-      res.redirect('/');
-    });
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    res.redirect(CLIENT_HOME_PAGE_URL);
   });
+});
 
 app.listen(port, () => console.log(`Server is running on port ${port}!`));
