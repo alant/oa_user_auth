@@ -80,16 +80,21 @@ app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("/auth", router);
+
 // when login is successful, retrieve user info
 router.get("/login/success", (req, res) => {
-  if (req.user) {
+  console.log("===> hit /login/success <===")
+  // if (req.user) {
+    console.log("===> res.json /login/success <===")
     res.json({
       success: true,
       message: "user has successfully authenticated",
-      user: req.user,
-      cookies: req.cookies
+      user: "abc",
+      token: "def"
     });
-  }
+  // }
+  console.log("===> end /login/success <===")
 });
 
 const authCheck = (req, res, next) => {
@@ -125,19 +130,18 @@ app.get('/auth/twitter/callback', passport.authenticate('twitter'));
 app.get('/auth/github', passport.authenticate('github'));
 app.get('/auth/github/callback',
   passport.authenticate('github', { 
-    // successRedirect: CLIENT_HOME_PAGE_URL,
+    successRedirect: CLIENT_HOME_PAGE_URL,
     failureRedirect: '/oops' , 
-        function(req, res) {
-        const token = req.user.token;
-        res.redirect(CLIENT_HOME_PAGE_URL + "?token=" + token);
-    }
+    //     function(req, res) {
+    //     const token = req.user.token;
+    //     res.redirect(CLIENT_HOME_PAGE_URL + "?token=" + token);
+    // }
   })
 );
 
 app.get('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    res.redirect(CLIENT_HOME_PAGE_URL);
-  });
+  req.session = null;
+  res.redirect(CLIENT_HOME_PAGE_URL);
 });
 
 app.listen(port, () => console.log(`Server is running on port ${port}!`));

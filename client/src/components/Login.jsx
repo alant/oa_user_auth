@@ -3,7 +3,7 @@ import { AuthContext } from "../App";
 import { Redirect } from "react-router-dom";
 
 function Login() {
-  const { dispatch, state } = React.useContext(AuthContext);
+  const { state } = React.useContext(AuthContext);
   // const [data, setData] = React.useState(initialState);
   // const initialState = {
   //   email: "",

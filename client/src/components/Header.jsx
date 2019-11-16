@@ -16,7 +16,7 @@ function Header() {
         {!state.isAuthenticated ? 
           <Link to="/login">Login</Link>
           :
-          <button class="link" onClick={handleLogOutClick}>Logout</button>
+          <button className="link" onClick={handleLogOutClick}>Logout</button>
         }
     </ul>
   );
