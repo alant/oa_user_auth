@@ -8,7 +8,8 @@ module.exports = function () {
   var db = mongoose.connect('mongodb://localhost:27017/oauth-demo',{
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: false
   });
 
   var UserSchema = new Schema({
@@ -27,7 +28,8 @@ module.exports = function () {
     githubProvider: {
       type: {
         id: String,
-        token: String
+        token: String,
+        refreshToken: String
       },
       select: false
     }
@@ -63,31 +65,25 @@ module.exports = function () {
     });
   };
 
-    UserSchema.statics.upsertGithubUser = function(accessToken, refreshToken, profile, cb) {
-    var that = this;
-    return this.findOne({
-      'githubProvider.id': profile.id
-    }, function(err, user) {
-      // no user was found, lets create a new one
-      if (!user) {
-        var newUser = new that({
-          // email: profile.emails[0].primary,
-          githubProvider: {
-            id: profile.id,
-            token: accessToken,
-            refreshToken: refreshToken
-          }
-        });
+  UserSchema.statics.upsertGithubUser = function(accessToken, refreshToken, profile, cb) {
+    // var that = this;
+    const filter = { 'githubProvider.id': profile.id };
+    const update = {    
+      githubProvider: {
+        id: profile.id,
+        token: accessToken,
+        refreshToken: refreshToken
+      } 
+    };
 
-        newUser.save(function(error, savedUser) {
-          if (error) {
-            console.log(error);
-          }
-          return cb(error, savedUser);
-        });
-      } else {
-        return cb(err, user);
+    return this.findOneAndUpdate(filter, update, {
+      new: true,
+      upsert: true // Make this update into an upsert
+    }, function(err, user) {
+      if (err) {
+        console.log(err);
       }
+      return cb(err, user);
     });
   };
 

@@ -21,11 +21,13 @@ function Home() {
         
         console.log("======>return json <=====");
         console.log(res);
+        if (res.data.success) {
+          dispatch({
+            type: "LOGIN",
+            payload: {user: "abc", token: "def"}
+          });
+        }
 
-        dispatch({
-          type: "LOGIN",
-          payload: {user: "abc", token: "def"}
-        });
       } catch (error) {
         console.log("======>something went wrong trying to authenticateu <=====");
         console.log(error);
