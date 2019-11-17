@@ -3,10 +3,12 @@ import { AuthContext } from "../App";
 import axios from 'axios';
 import { useLocation } from "react-router-dom";
 import queryString from 'query-string'
+// import { useNavigation } from 'react-navigation-hooks'
 
-function Home() {
+function Home(props) {
   const { dispatch, state } = React.useContext(AuthContext);
   const location = useLocation();
+  // const { navigate } = useNavigation();
 
   useEffect(() => {
     const values = queryString.parse(location.search)
@@ -16,6 +18,7 @@ function Home() {
         type: "LOGIN",
         payload: {user: "abc", token: values.token}
       });
+      props.history.push("/");
     }
 
     async function fetchUser() {
@@ -33,13 +36,14 @@ function Home() {
           }
         )
         
-        console.log("======>return json <=====");
-        console.log(res);
+        console.log("======>return json: ", res);
+
         if (res.data.success) {
           // dispatch({
           //   type: "LOGIN",
           //   payload: {user: "abc", token: "def"}
           // });
+          
         }
 
       } catch (error) {
@@ -49,7 +53,7 @@ function Home() {
       }
     }
     fetchUser();
-  }, [state.token, dispatch, location]);
+  }, [props.history, state.token, dispatch, location]);
 
   return (
     <div>

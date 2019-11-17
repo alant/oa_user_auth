@@ -60,13 +60,17 @@ passport.use(new GitHubStrategy({
   }
 ));
 
-passport.serializeUser(function(user, cb) {
-  console.log('====> serializeUser: ' + user._id)
-  cb(null, user);
+passport.serializeUser(function(user, done) {
+  console.log('====> serializeUser: ' + user);
+  done(null, user);
 });
 
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
+passport.deserializeUser(function(id, done) {
+  console.log('====> deserializeUser 1/2: ' + id);
+  User.findById(id).then((user) => {
+    console.log('====> deserializeUser 2/2: ' + user);
+    done(null, user);
+  });
 });
 
 app.use(cookieSession({
@@ -111,6 +115,7 @@ const authCheck = (req, res, next) => {
 
 // when login is successful, retrieve user info
 router.get("/login/success", authCheck, (req, res) => {
+  // console.log("==> /login/success: ", req);
   // if (req.user) {
     res.json({
       success: true,
@@ -169,6 +174,12 @@ app.get('/auth/github/callback',
       { expiresIn: 86400 }// expires in 24 hours
     );
     res.redirect(CLIENT_HOME_PAGE_URL+ "/#/?token=" + token);
+    // res.json({
+    //   success: true,
+    //   message: "user has successfully authenticated",
+    //   user: "abc",
+    //   token: token
+    // });
   }
   
 );
