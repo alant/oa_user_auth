@@ -11,6 +11,7 @@ const cookieParser = require("cookie-parser"); // parse cookie header
 const mongoose = require('./mongoose');
 const router = require("express").Router();
 const request = require('request');
+var jwt = require('jsonwebtoken');
 
 mongoose();
 const User = require('mongoose').model('User');
@@ -84,8 +85,32 @@ app.use(passport.session());
 
 app.use("/auth", router);
 
+const authCheck = (req, res, next) => {
+  let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
+  if (token.startsWith('Bearer ')) {
+    // Remove Bearer from string
+    token = token.slice(7, token.length);
+  }
+  console.log("==> token: ", token);
+  if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
+  jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+    if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    console.log("==> decoded: ", decoded);
+    next();
+  });
+
+  // if (!req.user) {
+  //   res.status(401).json({
+  //     authenticated: false,
+  //     message: "user has not been authenticated"
+  //   });
+  // } else {
+  //   next();
+  // }
+};
+
 // when login is successful, retrieve user info
-router.get("/login/success", (req, res) => {
+router.get("/login/success", authCheck, (req, res) => {
   // if (req.user) {
     res.json({
       success: true,
@@ -95,17 +120,6 @@ router.get("/login/success", (req, res) => {
     });
   // }
 });
-
-const authCheck = (req, res, next) => {
-  if (!req.user) {
-    res.status(401).json({
-      authenticated: false,
-      message: "user has not been authenticated"
-    });
-  } else {
-    next();
-  }
-};
 
 app.get("/", authCheck, (req, res) => {
   res.status(200).json({
@@ -149,8 +163,12 @@ app.get('/auth/github/callback',
     //     console.log("===> body: ", body);
     //   }
     // );
-
-    res.redirect(CLIENT_HOME_PAGE_URL);
+    var token = jwt.sign(
+      { id: req.user._id },
+      process.env.JWT_SECRET, 
+      { expiresIn: 86400 }// expires in 24 hours
+    );
+    res.redirect(CLIENT_HOME_PAGE_URL+ "/#/?token=" + token);
   }
   
 );
