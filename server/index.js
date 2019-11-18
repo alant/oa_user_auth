@@ -171,7 +171,7 @@ app.get('/auth/github/callback',
     var token = jwt.sign(
       { id: req.user._id },
       process.env.JWT_SECRET, 
-      { expiresIn: 86400 }// expires in 24 hours
+      { expiresIn: 30 * 24 * 60 * 60 }// expires in 24 hours
     );
     res.redirect(CLIENT_HOME_PAGE_URL+ "/#/?token=" + token);
     // res.json({
