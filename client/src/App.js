@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from "./components/Header";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
@@ -16,8 +16,15 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
-      localStorage.setItem("token", JSON.stringify(action.payload.token));
+      localStorage.setItem("user", action.payload.user);
+      localStorage.setItem("token", action.payload.token);
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload.user,
+        token: action.payload.token
+      };
+    case "LOGINWITHSTOREDTOKEN":
       return {
         ...state,
         isAuthenticated: true,
@@ -37,6 +44,19 @@ const reducer = (state, action) => {
 };
 function App() {
   const [state, dispatch] = React.useReducer(reducer, initialState);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    console.log("=> token: ", token);
+    if (token) {
+      dispatch({
+        type: "LOGINWITHSTOREDTOKEN",
+        payload: {user: user, token: token}
+      });
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -75,17 +95,5 @@ function PrivateRoute({ component: Component, isAuthenticated, ...rest }) {
     />
   );
 }
-
-// const fakeAuth = {
-//   isAuthenticated: false,
-//   authenticate(cb) {
-//     fakeAuth.isAuthenticated = true;
-//     setTimeout(cb, 100); // fake async
-//   },
-//   signout(cb) {
-//     fakeAuth.isAuthenticated = false;
-//     setTimeout(cb, 100);
-//   }
-// };
 
 export default App;

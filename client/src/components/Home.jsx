@@ -52,8 +52,11 @@ function Home(props) {
         // throw new Error("something went wrong trying to get authed user");
       }
     }
-    fetchUser();
-  }, [props.history, state.token, dispatch, location]);
+
+    if (state.isAuthenticated) {
+      fetchUser();
+    }
+  }, [props.history, state.token, state.isAuthenticated, dispatch, location]);
 
   return (
     <div>
