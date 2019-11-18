@@ -11,7 +11,8 @@
     "react-navigation": "^4.0.10",
     "react-navigation-hooks": "^1.1.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.1.1"
+    "react-scripts": "3.1.1",
+    "semantic-ui-react": "^0.88.1"
   },
   "scripts": {
     "start": "react-scripts start",
