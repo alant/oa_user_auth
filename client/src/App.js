@@ -3,7 +3,8 @@ import Header from "./components/Header";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
 import Login from "./components/Login";
-import { HashRouter as Router, Route, Redirect } from "react-router-dom";
+import Callback from "./components/Callback";
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
 export const AuthContext = React.createContext();
 
@@ -69,7 +70,8 @@ function App() {
         <div>
           <Route exact path="/" component={Home} />
           <PrivateRoute isAuthenticated={state.isAuthenticated} path="/profile" component={Profile} />
-          <Route exact path="/login" component={Login} />
+          <Route path="/login" component={Login} />
+          <Route path="/callback" component={Callback} />
         </div>
       </Router>
     </AuthContext.Provider>

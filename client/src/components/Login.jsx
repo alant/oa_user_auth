@@ -12,9 +12,12 @@ function Login() {
   //   // errorMessage: null
   // };
 
+  const CLIENT_ID = "6e0b5f325ac2e324312c";
+  const REDIRECT_URI = "http://127.0.0.1:3000/callback";
+
   const handleLogin = event => {
     event.preventDefault();
-    window.open("http://localhost:7000/auth/github", "_self");
+    window.open(`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=user&redirect_uri=${REDIRECT_URI}`, "_self");
 
     // fetch('http://localhost:7000/auth/github', {
     //   method: 'GET',

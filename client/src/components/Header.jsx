@@ -10,35 +10,22 @@ function Header() {
     <Sticky>
       <div class="ui secondary pointing menu">
         <a class="item">
-          Home
+          <Link to="/">Home</Link>
         </a>
         <a class="item">
-          Messages
-        </a>
-        <a class="item">
-          Friends
-        </a>
+          <Link to="/profile">Profile</Link>
+        </a>        
         <div class="right menu">
           <a class="ui item">
-            Logout
+            {!state.isAuthenticated ? 
+              <Link to="/login">Login</Link>
+              :
+              <a className="link" onClick={handleLogOutClick}>Logout</a>
+            }
           </a>
         </div>
-
       </div>
     </Sticky>
-    // <ul className="menu">
-    //   <li>
-    //     <Link to="/">Home</Link>
-    //   </li>
-    //   <li>
-    //     <Link to="/profile">Profile</Link>
-    //   </li>
-    //     {!state.isAuthenticated ? 
-    //       <Link to="/login">Login</Link>
-    //       :
-    //       <button className="link" onClick={handleLogOutClick}>Logout</button>
-    //     }
-    // </ul>
   );
 
   function handleLogOutClick() {
