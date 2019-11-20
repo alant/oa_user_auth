@@ -1,6 +1,6 @@
 import React, { useEffect }  from "react";
 import { AuthContext } from "../App";
-// import axios from 'axios';
+import axios from 'axios';
 import { useLocation } from "react-router-dom";
 import queryString from 'query-string'
 // import { useNavigation } from 'react-navigation-hooks'
@@ -13,12 +13,25 @@ function Callback(props) {
   useEffect(() => {
     const values = queryString.parse(location.search)
     console.log("===> call back values:", values);
-    if (values.token) {
-      dispatch({
-        type: "LOGIN",
-        payload: {user: "abc", token: values.token}
+    if (values.code) {
+      // dispatch({
+      //   type: "LOGIN",
+      //   payload: {user: "abc", token: values.token}
+      // });
+      // props.history.push("/");
+      axios.post('http://localhost:7000/login/github', JSON.stringify({
+        code: values.code
+      }), {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+      })
+      .then(function (response) {
+        console.log("=> backend /login/github:", response);
+      })
+      .catch(function (error) {
+        console.log("=> backend error /login/github:", error);
       });
-      props.history.push("/");
     }
 
     // async function fetchUser() {

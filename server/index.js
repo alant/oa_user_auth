@@ -11,7 +11,9 @@ const cookieParser = require("cookie-parser"); // parse cookie header
 const mongoose = require('./mongoose');
 const router = require("express").Router();
 const request = require('request');
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
+const bodyParser = require('body-parser');
 
 mongoose();
 const User = require('mongoose').model('User');
@@ -19,13 +21,32 @@ const User = require('mongoose').model('User');
 const CLIENT_HOME_PAGE_URL = "http://localhost:3000";
 const SERVER_URL = "http://127.0.0.1:7000";
 
-app.use(
-  cors({
-    origin: process.env.APP_URL,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true
-  })
-);
+
+const whitelist = [process.env.APP_URL, "http://127.0.0.1:3000"]
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    console.log("=> origin: ", origin);
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+  },
+  credentials: true,
+  enablePreflight: true
+}
+
+app.use(cors(corsOptions))
+app.options("*", cors(corsOptions))
+
+// app.use(
+//   cors({
+//     origin: process.env.APP_URL,
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     credentials: true
+//   })
+// );
 
 console.log("twitter keys: " + process.env.TWITTER_CONSUMER_KEY + ", " + process.env.TWITTER_CONSUMER_SECRET);
 
@@ -142,7 +163,7 @@ app.get("/oops", (req, res) => {
   });
 });
 
-app.get('/login/twitter', passport.authenticate('twitter'));
+app.get('/auth/twitter', passport.authenticate('twitter'));
 app.get('/auth/twitter/callback', passport.authenticate('twitter'));
 
 app.get('/auth/github', passport.authenticate('github'));
@@ -183,6 +204,29 @@ app.get('/auth/github/callback',
   }
   
 );
+
+app.use(bodyParser.json()); // handle json data
+app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json({ type: 'application/*+json' }));
+
+
+app.post('/login/github', (req, res) => {  
+  const access_code = req.body.code;
+  console.log("==> /login/github body:", req.body, "code: ", access_code);
+  axios.post('https://github.com/login/oauth/access_token', {
+    client_id: process.env.GITHUB_CLIENT_ID,
+    client_secret: process.env.GITHUB_CLIENT_SECRET,
+    code: req.body.code,
+  })
+  .then(function (response) {
+    console.log("=== github response ===");
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log("=== github error ===");
+    console.log(error);
+  });
+});
 
 app.get('/logout', (req, res) => {
   req.session = null;
