@@ -14,6 +14,7 @@ const request = require('request');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const bodyParser = require('body-parser');
+const queryString = require('query-string');
 
 mongoose();
 const User = require('mongoose').model('User');
@@ -219,8 +220,9 @@ app.post('/login/github', (req, res) => {
     code: req.body.code,
   })
   .then(function (response) {
-    console.log("=== github response ===");
-    console.log(response);
+    console.log("=== github response: ", response.data);
+    const parsed = queryString.parse(response.data);
+    console.log("=> parsed access_token: ", parsed.access_token);
   })
   .catch(function (error) {
     console.log("=== github error ===");
