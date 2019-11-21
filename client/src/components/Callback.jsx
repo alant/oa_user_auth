@@ -28,6 +28,11 @@ function Callback(props) {
       })
       .then(function (response) {
         console.log("=> backend /login/github:", response);
+        dispatch({
+          type: "LOGIN",
+          payload: {token: response.data.token}
+        });
+        props.history.push("/");
       })
       .catch(function (error) {
         console.log("=> backend error /login/github:", error);

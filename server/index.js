@@ -206,10 +206,8 @@ app.get('/auth/github/callback',
   
 );
 
-app.use(bodyParser.json()); // handle json data
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json({ type: 'application/*+json' }));
-
 
 app.post('/login/github', (req, res) => {  
   const access_code = req.body.code;
@@ -222,12 +220,63 @@ app.post('/login/github', (req, res) => {
   .then(function (response) {
     console.log("=== github response: ", response.data);
     const parsed = queryString.parse(response.data);
-    console.log("=> parsed access_token: ", parsed.access_token);
+    console.log("=> parsed access_tokeng: ", parsed.access_token);
+    const access_token = parsed.access_token;
+
+    request.get(
+      {
+        url: 'https://api.github.com/user',
+        headers: {
+          Authorization: 'token ' + access_token,
+          'User-Agent': 'smartshoppinglist'
+        }
+      },
+      (error, response, body) => {
+        body = JSON.parse(body);
+        // console.log("===> user body: ", body);
+        let profile = {
+          email: null,
+          id: body.id,
+          name: body.name,
+          avatar_url: body.avatar_url
+        };
+        if (profile.id) {
+          request.get(
+            {
+              url: 'https://api.github.com/user/public_emails',
+              headers: {
+                Authorization: 'token ' + access_token,
+                'User-Agent': 'smartshoppinglist'
+              }
+            },
+            (error, response, body) => {
+              // console.log("===> email: ", body);
+              body = JSON.parse(body);
+              email = body[0].email;
+              // console.log("===> email: ", email);
+              profile.email = email;
+              console.log("==> profile: ", profile);
+              User.upsertGithubUser(access_token, profile, (err, user) => null);
+              let jwt_token = jwt.sign(
+                { email: email },
+                process.env.JWT_SECRET, 
+                { expiresIn: 30 * 24 * 60 * 60 }// expires in 30 days
+              );
+              res.json({
+                token: jwt_token
+            });
+          }
+        );
+        }        
+      }
+    );
+
   })
   .catch(function (error) {
     console.log("=== github error ===");
     console.log(error);
   });
+
 });
 
 app.get('/logout', (req, res) => {

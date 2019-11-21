@@ -11,46 +11,37 @@ function Home(props) {
   // const { navigate } = useNavigation();
 
   useEffect(() => {
-    const values = queryString.parse(location.search)
-    console.log("===> values:", values);
-    if (values.token) {
-      dispatch({
-        type: "LOGIN",
-        payload: {user: "abc", token: values.token}
-      });
-      props.history.push("/");
-    }
 
     async function fetchUser() {
-      console.log("======>useEffect <=====");
-      try {
-        const res = await axios.get(
-          'http://localhost:7000/auth/login/success', {
-            withCredentials: true,
-            headers: {
-              'Authorization': 'Bearer ' + state.token,
-              // Accept: "application/json",
-              // "Content-Type": "application/json",
-              "Access-Control-Allow-Credentials": true
-            }
-          }
-        )
+      console.log("======>fetchUser <=====");
+      // try {
+      //   const res = await axios.get(
+      //     'http://localhost:7000/auth/login/success', {
+      //       withCredentials: true,
+      //       headers: {
+      //         'Authorization': 'Bearer ' + state.token,
+      //         // Accept: "application/json",
+      //         // "Content-Type": "application/json",
+      //         "Access-Control-Allow-Credentials": true
+      //       }
+      //     }
+      //   )
         
-        console.log("======>return json: ", res);
+      //   console.log("======>return json: ", res);
 
-        if (res.data.success) {
-          // dispatch({
-          //   type: "LOGIN",
-          //   payload: {user: "abc", token: "def"}
-          // });
+      //   if (res.data.success) {
+      //     // dispatch({
+      //     //   type: "LOGIN",
+      //     //   payload: {user: "abc", token: "def"}
+      //     // });
           
-        }
+      //   }
 
-      } catch (error) {
-        console.log("======>something went wrong trying to authenticateu <=====");
-        console.log(error);
-        // throw new Error("something went wrong trying to get authed user");
-      }
+      // } catch (error) {
+      //   console.log("======>something went wrong trying to authenticateu <=====");
+      //   console.log(error);
+      //   // throw new Error("something went wrong trying to get authed user");
+      // }
     }
 
     if (state.isAuthenticated) {

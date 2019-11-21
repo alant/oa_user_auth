@@ -13,11 +13,13 @@ module.exports = function () {
   });
 
   var UserSchema = new Schema({
-    // email: {
-    //   type: String, required: true,
-    //   trim: true, unique: true,
-    //   match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
-    // },
+    email: {
+      type: String, required: true,
+      trim: true, unique: true,
+      match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+    },
+    name: String,
+    avatar_url: String,
     twitterProvider: {
       type: {
         id: String,
@@ -28,8 +30,7 @@ module.exports = function () {
     githubProvider: {
       type: {
         id: String,
-        token: String,
-        refreshToken: String
+        access_token: String
       },
       select: false
     }
@@ -65,14 +66,16 @@ module.exports = function () {
     });
   };
 
-  UserSchema.statics.upsertGithubUser = function(accessToken, refreshToken, profile, cb) {
+  UserSchema.statics.upsertGithubUser = function(accessToken, profile, cb) {
     // var that = this;
     const filter = { 'githubProvider.id': profile.id };
-    const update = {    
+    const update = {  
+      email: profile.email,
+      name: profile.name,
+      avatar_url: profile.avatar_url,
       githubProvider: {
         id: profile.id,
-        token: accessToken,
-        refreshToken: refreshToken
+        access_token: accessToken
       } 
     };
 
