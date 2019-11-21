@@ -1,30 +1,24 @@
 import { Link } from "react-router-dom";
 import React from "react";
 import { AuthContext } from "../App";
-import { Sticky } from 'semantic-ui-react';
+import { Menu, Sticky } from 'semantic-ui-react';
 
 function Header() {
   const { dispatch, state } = React.useContext(AuthContext);
 
   return (
     <Sticky>
-      <div class="ui secondary pointing menu">
-        <a class="item">
-          <Link to="/">Home</Link>
-        </a>
-        <a class="item">
-          <Link to="/profile">Profile</Link>
-        </a>        
-        <div class="right menu">
-          <a class="ui item">
+      <Menu secondary>
+        <Menu.Item name='home' as={Link} to='/'>Home</Menu.Item>
+        <Menu.Item name='profile' as={Link} to='/profile'>Profile</Menu.Item>
+          <Menu.Menu position='right'>
             {!state.isAuthenticated ? 
-              <Link to="/login">Login</Link>
+              <Menu.Item name='login' as={Link} to='/login'>Profile</Menu.Item>
               :
-              <a className="link" onClick={handleLogOutClick}>Logout</a>
+              <Menu.Item name='logout' onClick={handleLogOutClick}>Logout</Menu.Item>
             }
-          </a>
-        </div>
-      </div>
+          </Menu.Menu>
+      </Menu>
     </Sticky>
   );
 
@@ -33,12 +27,6 @@ function Header() {
       type: "LOGOUT"
     });
   }
-  // handleLogInClick = () => {
-  //   window.open(process.env.REACT_APP_API_URL + "/login/github", "_self");
-  //   // console.log("env: " + process.env.REACT_APP_API_URL);
-  //   // axios.get(process.env.REACT_APP_API_URL + "/").then(
-  //   //   response => console.log(response));
-  // };
 }
 
 export default Header;

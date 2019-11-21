@@ -11,7 +11,6 @@ function Home(props) {
   // const { navigate } = useNavigation();
 
   useEffect(() => {
-
     async function fetchUser() {
       console.log("======>fetchUser <=====");
       // try {
