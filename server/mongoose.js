@@ -66,8 +66,7 @@ module.exports = function () {
     });
   };
 
-  UserSchema.statics.upsertGithubUser = function(accessToken, profile, cb) {
-    // var that = this;
+  UserSchema.statics.upsertGithubUser = async function(accessToken, profile) {
     const filter = { 'githubProvider.id': profile.id };
     const update = {  
       email: profile.email,
@@ -78,16 +77,16 @@ module.exports = function () {
         access_token: accessToken
       } 
     };
-
-    return this.findOneAndUpdate(filter, update, {
-      new: true,
-      upsert: true // Make this update into an upsert
-    }, function(err, user) {
-      if (err) {
-        console.log(err);
-      }
-      return cb(err, user);
-    });
+    try {
+      await this.findOneAndUpdate(filter, update, {
+          new: true,
+          upsert: true // Make this update into an upsert
+      });
+      return null;
+    } catch (err) {
+      console.log("===> upsertGithubUser error: ", err);
+      return err;
+    }
   };
 
   mongoose.model('User', UserSchema);

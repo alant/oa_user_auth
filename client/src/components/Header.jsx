@@ -13,7 +13,7 @@ function Header() {
         <Menu.Item name='profile' as={Link} to='/profile'>Profile</Menu.Item>
           <Menu.Menu position='right'>
             {!state.isAuthenticated ? 
-              <Menu.Item name='login' as={Link} to='/login'>Profile</Menu.Item>
+              <Menu.Item name='login' as={Link} to='/login'>Login</Menu.Item>
               :
               <Menu.Item name='logout' onClick={handleLogOutClick}>Logout</Menu.Item>
             }
