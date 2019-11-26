@@ -63,7 +63,7 @@ const authCheck = (req, res, next) => {
 
 // when login is successful, retrieve user info
 app.get("/profile", authCheck, async (req, res) => {
-  console.log("==> /profile req.decoded: ", req.decoded);
+  // console.log("==> /profile req.decoded: ", req.decoded);
   const profile = await User.findUser(req.decoded.email);
   res.json({
     user: profile

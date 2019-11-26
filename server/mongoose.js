@@ -61,11 +61,11 @@ module.exports = function () {
     }
   };
 
-    UserSchema.statics.findUser = async function(email) {
+  UserSchema.statics.findUser = async function(email) {
     const filter = { 'email': email };
     try {
       const res = await this.findOne(filter);
-      console.log("===> findUser: ", res);
+      // console.log("===> findUser: ", res);
       return res;
     } catch (err) {
       console.log("===> findUser error <====");
