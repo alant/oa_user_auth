@@ -2,45 +2,35 @@ import React, { useEffect }  from "react";
 import { AuthContext } from "../App";
 import axios from 'axios';
 import { useLocation } from "react-router-dom";
-import queryString from 'query-string'
-// import { useNavigation } from 'react-navigation-hooks'
 
 function Home(props) {
   const { dispatch, state } = React.useContext(AuthContext);
   const location = useLocation();
-  // const { navigate } = useNavigation();
 
   useEffect(() => {
     async function fetchUser() {
       console.log("======>fetchUser <=====");
-      // try {
-      //   const res = await axios.get(
-      //     'http://localhost:7000/auth/login/success', {
-      //       withCredentials: true,
-      //       headers: {
-      //         'Authorization': 'Bearer ' + state.token,
-      //         // Accept: "application/json",
-      //         // "Content-Type": "application/json",
-      //         "Access-Control-Allow-Credentials": true
-      //       }
-      //     }
-      //   )
-        
-      //   console.log("======>return json: ", res);
-
-      //   if (res.data.success) {
-      //     // dispatch({
-      //     //   type: "LOGIN",
-      //     //   payload: {user: "abc", token: "def"}
-      //     // });
-          
-      //   }
-
-      // } catch (error) {
-      //   console.log("======>something went wrong trying to authenticateu <=====");
-      //   console.log(error);
-      //   // throw new Error("something went wrong trying to get authed user");
-      // }
+      try {
+        const res = await axios.get(
+          'http://localhost:7000/profile', {
+            withCredentials: true,
+            headers: {
+              'Authorization': 'Bearer ' + state.token,
+              "Access-Control-Allow-Credentials": true
+            }
+          }
+        )
+        console.log("======>return json: ", res);
+        dispatch({
+          type: "SETUSER",
+          payload: {user: res.data.user.name}
+        });
+      } catch (error) {
+        console.log("======>something went wrong trying to get profile: <=====", error);
+        dispatch({
+          type: "LOGOUT"
+        });
+      }
     }
 
     if (state.isAuthenticated) {

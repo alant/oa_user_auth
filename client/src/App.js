@@ -17,19 +17,16 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
-      // localStorage.setItem("user", action.payload.user);
       localStorage.setItem("token", action.payload.token);
       return {
         ...state,
         isAuthenticated: true,
-        // user: action.payload.user,
         token: action.payload.token
       };
     case "LOGINWITHSTOREDTOKEN":
       return {
         ...state,
         isAuthenticated: true,
-        user: action.payload.user,
         token: action.payload.token
       };
     case "LOGOUT":
@@ -38,6 +35,11 @@ const reducer = (state, action) => {
         ...state,
         isAuthenticated: false,
         user: null
+      };
+    case "SETUSER":
+      return {
+        ...state,
+        user: action.payload.user
       };
     default:
       return state;
@@ -48,12 +50,11 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
     console.log("=> token: ", token);
     if (token) {
       dispatch({
         type: "LOGINWITHSTOREDTOKEN",
-        payload: {user: user, token: token}
+        payload: {token: token}
       });
     }
   }, []);

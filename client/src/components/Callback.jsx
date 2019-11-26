@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import queryString from 'query-string'
 
 function Callback(props) {
-  const { dispatch, state } = React.useContext(AuthContext);
+  const { dispatch } = React.useContext(AuthContext);
   const location = useLocation();
 
   useEffect(() => {
@@ -31,7 +31,7 @@ function Callback(props) {
         console.log("=> backend error /login/github:", error);
       });
     }
-  }, [dispatch, location]);
+  }, [dispatch, location, props.history]);
 
   return null;
 }

@@ -7,7 +7,6 @@ const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser"); // parse cookie header
 const mongoose = require('./mongoose');
 const router = require("express").Router();
-const request = require('request');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const bodyParser = require('body-parser');
@@ -17,13 +16,12 @@ mongoose();
 const User = require('mongoose').model('User');
 
 const CLIENT_HOME_PAGE_URL = "http://127.0.0.1:3000";
-const SERVER_URL = "http://127.0.0.1:7000";
 
 const cors_whitelist = [process.env.APP_URL, CLIENT_HOME_PAGE_URL]
 
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log("=> origin: ", origin);
+    // console.log("=> origin: ", origin);
       if (cors_whitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -46,46 +44,29 @@ app.use(cookieSession({
 // parse cookies
 app.use(cookieParser());
 
-app.use("/auth", router);
-
 const authCheck = (req, res, next) => {
   let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
   if (token.startsWith('Bearer ')) {
     // Remove Bearer from string
     token = token.slice(7, token.length);
   }
-  console.log("==> token: ", token);
   if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
   jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
-    if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-    console.log("==> decoded: ", decoded);
+    if (err) {
+      console.log("==> jwt error: ", err);
+      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    }
+    req.decoded = decoded;
     next();
   });
 };
 
 // when login is successful, retrieve user info
-router.get("/login/success", authCheck, (req, res) => {
+app.get("/profile", authCheck, async (req, res) => {
+  console.log("==> /profile req.decoded: ", req.decoded);
+  const profile = await User.findUser(req.decoded.email);
   res.json({
-    success: true,
-    message: "user has successfully authenticated",
-    user: "abc",
-    token: "def"
-  });
-});
-
-app.get("/", authCheck, (req, res) => {
-  res.status(200).json({
-    authenticated: true,
-    message: "oh yea, user successfully authenticated",
-    user: req.user,
-    cookies: req.cookies
-  });
-});
-
-app.get("/oops", (req, res) => {
-  res.status(401).json({
-    success: false,
-    message: "oh no, auth failed"
+    user: profile
   });
 });
 
@@ -123,6 +104,15 @@ app.post('/login/github', async (req, res) => {
         }
       }
     );
+    
+    let jwt_token = jwt.sign(
+        { email: email_resp.data[0].email },
+        process.env.JWT_SECRET, 
+        { expiresIn: 30 * 24 * 60 * 60 }// expires in 30 days
+    );
+    res.json({
+        token: jwt_token
+    });
 
     let profile = {
       email: email_resp.data[0].email,
@@ -130,17 +120,8 @@ app.post('/login/github', async (req, res) => {
       name: user_resp.data.name,
       avatar_url: user_resp.data.avatar_url
     };
-    
-    await User.upsertGithubUser(access_token, profile);
-    let jwt_token = jwt.sign(
-        { email: email },
-        process.env.JWT_SECRET, 
-        { expiresIn: 30 * 24 * 60 * 60 }// expires in 30 days
-    );
 
-    res.json({
-        token: jwt_token
-    });
+    await User.upsertGithubUser(access_token, profile);
   } catch (err) {
     console.log("====> github err: ", err);
     res.status(500).send({ auth: false, message: 'Failed to auth through github.' });
