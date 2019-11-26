@@ -3,13 +3,24 @@
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
-module.exports = function () {
+const {
+  MONGO_USERNAME,
+  MONGO_PASSWORD,
+  MONGO_HOSTNAME,
+  MONGO_PORT,
+  MONGO_DB
+} = process.env;
 
-  var db = mongoose.connect('mongodb://localhost:27017/oauth-demo',{
+module.exports = async function () {
+
+  var db = mongoose.connect(`mongodb://${MONGO_HOSTNAME}:${MONGO_PORT}/${MONGO_DB}`,{
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
     useFindAndModify: false
+  }).catch(err => {
+    console.log("==> mongoose.connect error: <==");
+    throw err;
   });
 
   var UserSchema = new Schema({
