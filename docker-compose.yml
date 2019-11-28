@@ -1,6 +1,22 @@
 version: '3'
 
 services:
+  reactapp:
+    container_name: reactjs
+    restart: unless-stopped
+    build: ./client
+    command: sh -c "/wait && cd reactapp && npm start"
+    volumes:
+      - ./client:/reactapp
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    links:
+      - nodejs
+    environment:
+      WAIT_HOSTS: nodeserver:7000
+
   nodejs:
     container_name: nodeserver
     restart: unless-stopped
