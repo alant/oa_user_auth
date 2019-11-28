@@ -15,9 +15,7 @@ const queryString = require('query-string');
 mongoose();
 const User = require('mongoose').model('User');
 
-const CLIENT_HOME_PAGE_URL = "http://127.0.0.1:3000";
-
-const cors_whitelist = [process.env.APP_URL, CLIENT_HOME_PAGE_URL]
+const cors_whitelist = [process.env.APP_URL, process.env.APP_URL2]
 
 const corsOptions = {
   origin: function (origin, callback) {
