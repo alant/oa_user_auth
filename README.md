@@ -6,16 +6,17 @@ To run it:
   mkdir data
   ```
 2. Create the env files. 
-  .env.development.local in client dir, for example:
-  
+  .env.development.local in client dir, note that react requires envionrment var to start with REACT_APP_ to be able to access it. for example:
+
   ```
-  REACT_APP_API_URL=http://127.0.0.1:7000
+  REACT_APP_APP_URL=https://127.0.0.1:3000
   ```
 
   .env in server dir needs to have:
   ```
   APP_URL=http://localhost:3000
   APP_URL2=http://127.0.0.1:3000
+  APP_URL3=https://127.0.0.1:3000
   GITHUB_CLIENT_ID=changeit
   GITHUB_CLIENT_SECRET=changeit
   JWT_SECRET=changeit

@@ -7,7 +7,7 @@ function Login() {
   const { state } = React.useContext(AuthContext);
 
   const GITHUB_CLIENT_ID = "6e0b5f325ac2e324312c";
-  const GITHUB_REDIRECT_URI = "http://127.0.0.1:3000/callback";
+  const GITHUB_REDIRECT_URI = process.env.REACT_APP_APP_URL + "/callback";
 
   // const TWITTER_CLIENT_ID = "6e0b5f325ac2e324312c";
   // const TWITTER_REDIRECT_URI = "http://127.0.0.1:3000/callback";

@@ -1,22 +1,24 @@
 require('dotenv').config();
 const express = require("express");
 const app = express();
-const port = 7000;
 const cors = require("cors");
 const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser"); // parse cookie header
 const mongoose = require('./mongoose');
-const router = require("express").Router();
+mongoose();
+const User = require('mongoose').model('User');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const queryString = require('query-string');
 
-mongoose();
-const User = require('mongoose').model('User');
+const port = 7000;
 
-const cors_whitelist = [process.env.APP_URL, process.env.APP_URL2]
-
+const cors_whitelist = [
+  process.env.APP_URL,
+  process.env.APP_URL2,
+  process.env.APP_URL3
+];
 const corsOptions = {
   origin: function (origin, callback) {
     // console.log("=> origin: ", origin);
@@ -59,7 +61,6 @@ const authCheck = (req, res, next) => {
   });
 };
 
-// when login is successful, retrieve user info
 app.get("/profile", authCheck, async (req, res) => {
   // console.log("==> /profile req.decoded: ", req.decoded);
   const profile = await User.findUser(req.decoded.email);
@@ -128,7 +129,7 @@ app.post('/login/github', async (req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session = null;
-  res.redirect(CLIENT_HOME_PAGE_URL);
+  // res.redirect(CLIENT_HOME_PAGE_URL);
 });
 
 app.listen(port, () => console.log(`Server is running on port ${port}!`));
