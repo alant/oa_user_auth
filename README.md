@@ -5,7 +5,8 @@ To run it:
   ```
   mkdir data
   ```
-2. Create the env files. 
+2. Create the env files
+
   .env.development.local in client dir, note that react requires envionrment var to start with REACT_APP_ to be able to access it. for example:
 
   ```

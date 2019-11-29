@@ -4,6 +4,7 @@ import Home from "./components/Home";
 import Profile from "./components/Profile";
 import Login from "./components/Login";
 import Callback from "./components/Callback";
+import Privacy from "./components/Privacy";
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
 export const AuthContext = React.createContext();
@@ -71,6 +72,7 @@ function App() {
         <div>
           <Route exact path="/" component={Home} />
           <PrivateRoute isAuthenticated={state.isAuthenticated} path="/profile" component={Profile} />
+          <Route path="/privacy" component={Privacy} />
           <Route path="/login" component={Login} />
           <Route path="/callback" component={Callback} />
         </div>

@@ -11,13 +11,14 @@ function Header() {
       <Menu secondary>
         <Menu.Item name='home' as={Link} to='/'>Home</Menu.Item>
         <Menu.Item name='profile' as={Link} to='/profile'>Profile</Menu.Item>
-          <Menu.Menu position='right'>
-            {!state.isAuthenticated ? 
-              <Menu.Item name='login' as={Link} to='/login'>Login</Menu.Item>
-              :
-              <Menu.Item name='logout' onClick={handleLogOutClick}>Logout</Menu.Item>
-            }
-          </Menu.Menu>
+        <Menu.Item name='privacy' as={Link} to='/privacy'>Privacy</Menu.Item>
+        <Menu.Menu position='right'>
+          {!state.isAuthenticated ? 
+            <Menu.Item name='login' as={Link} to='/login'>Login</Menu.Item>
+            :
+            <Menu.Item name='logout' onClick={handleLogOutClick}>Logout</Menu.Item>
+          }
+        </Menu.Menu>
       </Menu>
     </Sticky>
   );
