@@ -24,5 +24,6 @@ To run it:
   MONGO_PORT=27017
   MONGO_DB=oauth-demo
   ```
-3. run: `docker-compose up` to start both frontend and backend
+3. Now that the client run on https, you'll need to have your computer trust the localhost certificate. [Detailed steps can be found here](https://medium.com/@danielgwilson/https-and-create-react-app-3a30ed31c904). 
+4. run: `docker-compose up` to start both frontend and backend. open browser, go to https://127.0.0.1:3000
 
