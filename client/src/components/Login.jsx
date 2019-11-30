@@ -5,7 +5,7 @@ import { Grid } from 'semantic-ui-react';
 // import axios from 'axios';
 
 function Login() {
-  const { state } = React.useContext(AuthContext);
+  const { state, dispatch } = React.useContext(AuthContext);
 
   const GITHUB_CLIENT_ID = "6e0b5f325ac2e324312c";
   const GITHUB_REDIRECT_URI = process.env.REACT_APP_APP_URL + "/callback";
@@ -18,30 +18,33 @@ function Login() {
     window.open(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=user&redirect_uri=${GITHUB_REDIRECT_URI}`, "_self");
   };
 
-  const statusChangeCallback = (response) => {
-    console.log('statusChangeCallback');
-    console.log(response);
-    if (response.status === 'connected') {
-      console.log('Welcome!  Fetching your information.... ');
-      window.FB.api('/me', function(response) {
-        console.log('Successful login for: ' + response.name);
-      });
-    } else if (response.status === 'not_authorized') {
-      console.log("Please log into this app.");
-    } else {
-      console.log("Please log into this facebook.");
-    }
-  };
-
-  const checkFBLoginState = () => {
-    window.FB.getLoginStatus(function(response) {
-      statusChangeCallback(response);
-    });
-  }
-
   const handleFacebookLogin = async (event) => {
     event.preventDefault();
-    window.FB.login(checkFBLoginState());
+    window.FB.getLoginStatus(function(response) {
+      console.log('getLoginStatus');
+      console.log(response);
+      if (response.status === 'connected') {
+        console.log('Welcome!  Fetching your information.... ');
+        window.FB.api('/me', function(response) {
+          console.log('Successful login for: ' + JSON.stringify(response));
+        }); 
+        dispatch({
+          type: "LOGIN",
+          payload: {token: response.authResponse.accessToken, method: "FACEBOOK"}
+        });
+      } else {
+        console.log("Please log into this facebook.");
+        window.FB.login(function(response) {
+          console.log('FB.login resp: ' + JSON.stringify(response));
+          if (response.status === 'connected') {
+            dispatch({
+              type: "LOGIN",
+              payload: {token: response.authResponse.accessToken, method: "FACEBOOK"}
+            });
+          }
+        }, {scope: 'public_profile,email'});
+      }
+    });  
   };
 
   const initFBSDK = () => {

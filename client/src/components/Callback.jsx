@@ -23,7 +23,7 @@ function Callback(props) {
         console.log("=> backend /login/github:", response);
         dispatch({
           type: "LOGIN",
-          payload: {token: response.data.token}
+          payload: {token: response.data.token, method: "GITHUB"}
         });
         props.history.push("/");
       })

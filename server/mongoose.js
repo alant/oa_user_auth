@@ -30,17 +30,18 @@ module.exports = async function () {
       match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
     },
     name: String,
-    avatar_url: String,
-    twitterProvider: {
+    facebookProvider: {
       type: {
         id: String,
-        token: String
+        avatar_url: String,
+        access_token: String
       },
       select: false
     },
     githubProvider: {
       type: {
         id: String,
+        avatar_url: String,
         access_token: String
       },
       select: false
@@ -54,9 +55,9 @@ module.exports = async function () {
     const update = {  
       email: profile.email,
       name: profile.name,
-      avatar_url: profile.avatar_url,
       githubProvider: {
         id: profile.id,
+        avatar_url: profile.avatar_url,
         access_token: accessToken
       } 
     };

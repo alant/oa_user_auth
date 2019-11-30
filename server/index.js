@@ -127,6 +127,62 @@ app.post('/login/github', async (req, res) => {
   }
 });
 
+app.post('/login/facebook', async (req, res) => {  
+  const access_token = req.body.accessToken;
+  // console.log("==> /login/github body:", req.body, "code: ", access_code);
+  try {
+    // exchange for a longlived token, get user's name and email, upsert, return jwt token
+    
+    // const atoken_resp = await axios.post('https://github.com/login/oauth/access_token',
+    //   {
+    //     client_id: process.env.GITHUB_CLIENT_ID,
+    //     client_secret: process.env.GITHUB_CLIENT_SECRET,
+    //     code: req.body.code
+    //   }
+    // );
+    // const parsed = queryString.parse(atoken_resp.data);
+    // console.log("=> parsed access_tokeng: ", parsed.access_token);
+    // const access_token = parsed.access_token;
+
+    // const user_resp = await axios.get('https://graph.facebook.com/{graph-api-version}/oauth/access_token?  
+    //   grant_type=fb_exchange_token&          
+    //   client_id={app-id}&
+    //   client_secret={app-secret}&
+    //   fb_exchange_token={your-access-token}',
+    // );
+
+    // const email_resp = await axios.get('https://api.github.com/user/public_emails',
+    //   {
+    //     headers: {
+    //       'Authorization': "bearer " + access_token,
+    //       'User-Agent': 'smartshoppinglist'
+    //     }
+    //   }
+    // );
+    
+    // let jwt_token = jwt.sign(
+    //     { email: email_resp.data[0].email },
+    //     process.env.JWT_SECRET, 
+    //     { expiresIn: 30 * 24 * 60 * 60 }// expires in 30 days
+    // );
+    // res.json({
+    //     token: jwt_token
+    // });
+
+    // let profile = {
+    //   email: email_resp.data[0].email,
+    //   id: user_resp.data.id,
+    //   name: user_resp.data.name,
+    //   avatar_url: user_resp.data.avatar_url
+    // };
+
+    // await User.upsertFacebookUser(access_token, profile);
+  } catch (err) {
+    console.log("====> facebook err: ", err);
+    res.status(500).send({ auth: false, message: 'Failed to auth through facebook.' });
+  }
+});
+
 app.get('/logout', (req, res) => {
   req.session = null;
   // res.redirect(CLIENT_HOME_PAGE_URL);

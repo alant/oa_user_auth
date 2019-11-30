@@ -11,6 +11,7 @@ export const AuthContext = React.createContext();
 
 const initialState = {
   isAuthenticated: false,
+  method: null,
   user: null,
   token: null,
 };
@@ -22,7 +23,8 @@ const reducer = (state, action) => {
       return {
         ...state,
         isAuthenticated: true,
-        token: action.payload.token
+        token: action.payload.token,
+        method: action.payload.method
       };
     case "LOGINWITHSTOREDTOKEN":
       return {
@@ -31,6 +33,12 @@ const reducer = (state, action) => {
         token: action.payload.token
       };
     case "LOGOUT":
+      if (state.method === "FACEBOOK") {
+        window.FB.logout(function(response) {
+          // Person is now logged out
+          console.log("==> FB logout: ", JSON.stringify(response));
+        });
+      }
       localStorage.clear();
       return {
         ...state,
