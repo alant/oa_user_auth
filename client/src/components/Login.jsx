@@ -11,7 +11,6 @@ function Login(props) {
   const GITHUB_REDIRECT_URI = process.env.REACT_APP_APP_URL + "/callback";
 
   const FACEBOOK_APP_ID = "1668438256731685";
-  const FACEBOOK_API_VERSION = "v5.0";
 
   const handleGithubLogin = event => {
     event.preventDefault();
@@ -57,7 +56,7 @@ function Login(props) {
         appId            : FACEBOOK_APP_ID,
         autoLogAppEvents : true,
         xfbml            : true,
-        version          : FACEBOOK_API_VERSION
+        version          : 'v5.0'
       });
     };
     (function(d, s, id) {
