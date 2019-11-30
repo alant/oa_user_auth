@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import { AuthContext } from "../App";
 import { Redirect } from "react-router-dom";
 import { Grid } from 'semantic-ui-react';
-// import axios from 'axios';
+import axios from 'axios';
 
 function Login() {
-  const { state, dispatch } = React.useContext(AuthContext);
+  const { state } = React.useContext(AuthContext);
 
   const GITHUB_CLIENT_ID = "6e0b5f325ac2e324312c";
   const GITHUB_REDIRECT_URI = process.env.REACT_APP_APP_URL + "/callback";
@@ -16,7 +16,28 @@ function Login() {
   const handleGithubLogin = event => {
     event.preventDefault();
     window.open(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=user&redirect_uri=${GITHUB_REDIRECT_URI}`, "_self");
-  };
+  }
+
+  const getJWT = async (token) => {
+    try {
+      const resp = await axios.post('http://localhost:7000/login/facebook',
+        JSON.stringify({ access_token: token }),
+        {
+          headers: { 'Content-Type': 'application/json',}
+        }
+      );
+    
+      console.log("=> backend /login/facebook:", resp.data.token);
+      // dispatch({
+      //   type: "LOGIN",
+      //   payload: {token: response.data.token, method: "FACEBOOK"}
+      // });
+      // props.history.push("/");
+
+    } catch(error) {
+      console.log("=> backend error /login/github:", error);
+    }
+  }
 
   const handleFacebookLogin = async (event) => {
     event.preventDefault();
@@ -24,23 +45,25 @@ function Login() {
       console.log('getLoginStatus');
       console.log(response);
       if (response.status === 'connected') {
-        console.log('Welcome!  Fetching your information.... ');
-        window.FB.api('/me', function(response) {
-          console.log('Successful login for: ' + JSON.stringify(response));
-        }); 
-        dispatch({
-          type: "LOGIN",
-          payload: {token: response.authResponse.accessToken, method: "FACEBOOK"}
-        });
+        getJWT(response.authResponse.accessToken);
+        // console.log('Welcome!  Fetching your information.... ');
+        // window.FB.api('/me', function(response) {
+        //   console.log('Successful login for: ' + JSON.stringify(response));
+        // }); 
+        // dispatch({
+        //   type: "LOGIN",
+        //   payload: {token: response.authResponse.accessToken, method: "FACEBOOK"}
+        // });
       } else {
         console.log("Please log into this facebook.");
         window.FB.login(function(response) {
           console.log('FB.login resp: ' + JSON.stringify(response));
           if (response.status === 'connected') {
-            dispatch({
-              type: "LOGIN",
-              payload: {token: response.authResponse.accessToken, method: "FACEBOOK"}
-            });
+            getJWT(response.authResponse.accessToken);
+            // dispatch({
+            //   type: "LOGIN",
+            //   payload: {token: response.authResponse.accessToken, method: "FACEBOOK"}
+            // });
           }
         }, {scope: 'public_profile,email'});
       }

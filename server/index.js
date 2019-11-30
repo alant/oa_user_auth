@@ -129,7 +129,7 @@ app.post('/login/github', async (req, res) => {
 
 app.post('/login/facebook', async (req, res) => {  
   const access_token = req.body.accessToken;
-  // console.log("==> /login/github body:", req.body, "code: ", access_code);
+  console.log("==> /login/github body:", req.body, "token: ", access_token);
   try {
     // exchange for a longlived token, get user's name and email, upsert, return jwt token
     
@@ -160,14 +160,14 @@ app.post('/login/facebook', async (req, res) => {
     //   }
     // );
     
-    // let jwt_token = jwt.sign(
-    //     { email: email_resp.data[0].email },
-    //     process.env.JWT_SECRET, 
-    //     { expiresIn: 30 * 24 * 60 * 60 }// expires in 30 days
-    // );
-    // res.json({
-    //     token: jwt_token
-    // });
+    let jwt_token = jwt.sign(
+        { email: "abc@abc.com" },
+        process.env.JWT_SECRET, 
+        { expiresIn: 30 * 24 * 60 * 60 }// expires in 30 days
+    );
+    res.json({
+        token: jwt_token
+    });
 
     // let profile = {
     //   email: email_resp.data[0].email,
