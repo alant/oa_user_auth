@@ -15,15 +15,17 @@ To run it:
 
   .env in server dir needs to have:
   ```
-  APP_URL=http://localhost:3000
+  APP_URL=https://localhost:3000
   APP_URL2=http://127.0.0.1:3000
   APP_URL3=https://127.0.0.1:3000
-  GITHUB_CLIENT_ID=changeit
-  GITHUB_CLIENT_SECRET=changeit
-  JWT_SECRET=changeit
   MONGO_HOSTNAME=mongodb
   MONGO_PORT=27017
   MONGO_DB=oauth-demo
+  JWT_SECRET=changeit
+  GITHUB_CLIENT_ID=changeit
+  GITHUB_CLIENT_SECRET=changeit
+  FACEBOOK_APP_ID=changeit
+  FACEBOOK_APP_SECRET=changeit
   ```
 3. Now that the client run on https, you'll need to have your computer trust the localhost certificate. [Detailed steps can be found here](https://medium.com/@danielgwilson/https-and-create-react-app-3a30ed31c904). 
 4. run: `docker-compose up` to start both frontend and backend. open browser, go to https://127.0.0.1:3000
