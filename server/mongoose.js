@@ -51,7 +51,7 @@ module.exports = async function () {
   UserSchema.set('toJSON', {getters: true, virtuals: true});
 
   UserSchema.statics.upsertGithubUser = async function(accessToken, profile) {
-    const filter = { 'githubProvider.id': profile.id };
+    const filter = { 'email': profile.email };
     const update = {  
       email: profile.email,
       name: profile.name,
@@ -69,6 +69,29 @@ module.exports = async function () {
       return null;
     } catch (err) {
       console.log("===> upsertGithubUser error <===");
+      throw err;
+    }
+  };
+
+  UserSchema.statics.upsertFacebookUser = async function(accessToken, profile) {
+    const filter = { 'email': profile.email };
+    const update = {  
+      email: profile.email,
+      name: profile.name,
+      facebookProvider: {
+        id: profile.id,
+        avatar_url: profile.avatar_url,
+        access_token: accessToken
+      } 
+    };
+    try {
+      await this.findOneAndUpdate(filter, update, {
+          new: true,
+          upsert: true // Make this update into an upsert
+      });
+      return null;
+    } catch (err) {
+      console.log("===> upsertFacebookUser error <===");
       throw err;
     }
   };

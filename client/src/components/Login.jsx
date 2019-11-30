@@ -4,8 +4,8 @@ import { Redirect } from "react-router-dom";
 import { Grid } from 'semantic-ui-react';
 import axios from 'axios';
 
-function Login() {
-  const { state } = React.useContext(AuthContext);
+function Login(props) {
+  const { state, dispatch } = React.useContext(AuthContext);
 
   const GITHUB_CLIENT_ID = "6e0b5f325ac2e324312c";
   const GITHUB_REDIRECT_URI = process.env.REACT_APP_APP_URL + "/callback";
@@ -27,15 +27,18 @@ function Login() {
         }
       );
     
-      console.log("=> backend /login/facebook:", resp.data.token);
-      // dispatch({
-      //   type: "LOGIN",
-      //   payload: {token: response.data.token, method: "FACEBOOK"}
-      // });
-      // props.history.push("/");
+      // console.log("=> backend /login/facebook:", resp.data.token);
+      dispatch({
+        type: "LOGIN",
+        payload: {token: resp.data.token, method: "FACEBOOK"}
+      });
+      props.history.push("/");
 
     } catch(error) {
       console.log("=> backend error /login/github:", error);
+      window.FB.logout(function(response) {
+        // Person is now logged out
+      });
     }
   }
 
