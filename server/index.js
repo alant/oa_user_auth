@@ -36,15 +36,6 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.options("*", cors(corsOptions))
 
-app.use(cookieSession({
-  name: 'session',
-  keys: ['key1', 'key2'],
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
-// parse cookies
-app.use(cookieParser());
-
 const authCheck = (req, res, next) => {
   let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
   if (token.startsWith('Bearer ')) {
@@ -126,7 +117,6 @@ app.post('/login/github', async (req, res) => {
 
 app.post('/login/facebook', async (req, res) => {  
   const access_token = req.body.access_token;
-  console.log("==> /login/facebook body:", req.body, "token: ", access_token);
   let email;
   try {
     // exchange short term access token for a longlived token, get user's name and email, upsert, return jwt token
@@ -147,13 +137,13 @@ app.post('/login/facebook', async (req, res) => {
       }
     });
     email = user_resp.data.email
-    // console.log("==> /login/facebook resp:", user_resp);
+    // console.log("==> /login/facebook resp:", user_resp.data);
 
     let profile = {
       email: user_resp.data.email,
       id: user_resp.data.id,
       name: user_resp.data.name,
-      avatar_url: user_resp.data.picture.url
+      avatar_url: user_resp.data.picture.data.url
     };
 
     await User.upsertFacebookUser(access_token, profile);
@@ -169,11 +159,6 @@ app.post('/login/facebook', async (req, res) => {
   res.json({
       token: jwt_token
   });
-});
-
-app.get('/logout', (req, res) => {
-  req.session = null;
-  // res.redirect(CLIENT_HOME_PAGE_URL);
 });
 
 app.listen(port, () => console.log(`Server is running on port ${port}!`));

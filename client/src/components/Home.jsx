@@ -9,30 +9,23 @@ function Home(props) {
 
   useEffect(() => {
     async function fetchUser() {
-      console.log("======>fetchUser <=====");
       try {
-        const res = await axios.get(
-          'http://localhost:7000/profile', {
+        const res = await axios.get('http://localhost:7000/profile', {
             withCredentials: true,
             headers: {
               'Authorization': 'Bearer ' + state.token,
               "Access-Control-Allow-Credentials": true
             }
-          }
-        )
-        console.log("======>return json: ", res);
+        });
         dispatch({
           type: "SETUSER",
           payload: {user: res.data.user.name}
         });
       } catch (error) {
         console.log("======>something went wrong trying to get profile: <=====", error);
-        dispatch({
-          type: "LOGOUT"
-        });
+        dispatch({ type: "LOGOUT" });
       }
     }
-
     if (state.isAuthenticated) {
       fetchUser();
     }

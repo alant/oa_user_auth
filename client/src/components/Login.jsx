@@ -10,81 +10,56 @@ function Login(props) {
   const GITHUB_CLIENT_ID = "6e0b5f325ac2e324312c";
   const GITHUB_REDIRECT_URI = process.env.REACT_APP_APP_URL + "/callback";
 
-  // const TWITTER_CLIENT_ID = "6e0b5f325ac2e324312c";
-  // const TWITTER_REDIRECT_URI = "http://127.0.0.1:3000/callback";
+  const FACEBOOK_APP_ID = "1668438256731685";
+  const FACEBOOK_API_VERSION = "v5.0";
 
   const handleGithubLogin = event => {
     event.preventDefault();
     window.open(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=user&redirect_uri=${GITHUB_REDIRECT_URI}`, "_self");
   }
 
-  const getJWT = async (token) => {
+  const exchangeFBtokenWithJWT = async (token) => {
     try {
       const resp = await axios.post('http://localhost:7000/login/facebook',
-        JSON.stringify({ access_token: token }),
-        {
+        JSON.stringify({ access_token: token }), {
           headers: { 'Content-Type': 'application/json',}
         }
       );
-    
-      // console.log("=> backend /login/facebook:", resp.data.token);
       dispatch({
         type: "LOGIN",
         payload: {token: resp.data.token, method: "FACEBOOK"}
       });
       props.history.push("/");
-
     } catch(error) {
-      console.log("=> backend error /login/github:", error);
-      window.FB.logout(function(response) {
-        // Person is now logged out
-      });
+      console.log("=> backend error /login/facebook:", error);
+      window.FB.logout((function(response) {}));
     }
   }
 
-  const handleFacebookLogin = async (event) => {
+  const handleFacebookLogin = (event) => {
     event.preventDefault();
     window.FB.getLoginStatus(function(response) {
-      console.log('getLoginStatus');
-      console.log(response);
       if (response.status === 'connected') {
-        getJWT(response.authResponse.accessToken);
-        // console.log('Welcome!  Fetching your information.... ');
-        // window.FB.api('/me', function(response) {
-        //   console.log('Successful login for: ' + JSON.stringify(response));
-        // }); 
-        // dispatch({
-        //   type: "LOGIN",
-        //   payload: {token: response.authResponse.accessToken, method: "FACEBOOK"}
-        // });
+        exchangeFBtokenWithJWT(response.authResponse.accessToken);
       } else {
-        console.log("Please log into this facebook.");
         window.FB.login(function(response) {
-          console.log('FB.login resp: ' + JSON.stringify(response));
           if (response.status === 'connected') {
-            getJWT(response.authResponse.accessToken);
-            // dispatch({
-            //   type: "LOGIN",
-            //   payload: {token: response.authResponse.accessToken, method: "FACEBOOK"}
-            // });
+            exchangeFBtokenWithJWT(response.authResponse.accessToken);
           }
         }, {scope: 'public_profile,email'});
       }
     });  
   };
 
-  const initFBSDK = () => {
+  const initFB = () => {
     window.fbAsyncInit = function() {
       window.FB.init({
-        appId            : '1668438256731685',
+        appId            : FACEBOOK_APP_ID,
         autoLogAppEvents : true,
         xfbml            : true,
-        version          : 'v5.0'
+        version          : FACEBOOK_API_VERSION
       });
     };
-
-    console.log("Loading fb api");
-
     (function(d, s, id) {
       var js, fjs=d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) {return;}
@@ -95,7 +70,9 @@ function Login(props) {
   };
 
   useEffect(() => {
-    initFBSDK();
+    if (!window.FB) {
+      initFB();
+    }
   });
 
   return (

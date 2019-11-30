@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import Header from "./components/Header";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Callback from "./components/Callback";
 import Privacy from "./components/Privacy";
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+// import { StateInspector, useReducer } from "reinspect";
 
 export const AuthContext = React.createContext();
 
@@ -33,12 +34,6 @@ const reducer = (state, action) => {
         token: action.payload.token
       };
     case "LOGOUT":
-      if (state.method === "FACEBOOK") {
-        window.FB.logout(function(response) {
-          // Person is now logged out
-          console.log("==> FB logout: ", JSON.stringify(response));
-        });
-      }
       localStorage.clear();
       return {
         ...state,
@@ -55,11 +50,10 @@ const reducer = (state, action) => {
   }
 };
 function App() {
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log("=> token: ", token);
     if (token) {
       dispatch({
         type: "LOGINWITHSTOREDTOKEN",
@@ -69,12 +63,7 @@ function App() {
   }, []);
 
   return (
-    <AuthContext.Provider
-      value={{
-        state,
-        dispatch
-      }}
-    >
+    <AuthContext.Provider value={{ state, dispatch }}>
       <Router>
         <Header/>
         <div>
