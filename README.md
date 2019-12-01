@@ -11,14 +11,12 @@ Interesting interview take home challenge. So far it supports github and faceboo
   .env.development.local in client dir, note that react requires envionrment var to start with REACT_APP_ to be able to access it. for example:
 
   ```
-  REACT_APP_APP_URL=https://127.0.0.1:3000
+  REACT_APP_APP_URL=https://localhost:3000
   ```
 
   .env in server dir, you need to replace "changeit" below with your actual credentials on corresponding oauth provider platform:
   ```
   APP_URL=https://localhost:3000
-  APP_URL2=http://127.0.0.1:3000
-  APP_URL3=https://127.0.0.1:3000
   MONGO_HOSTNAME=mongodb
   MONGO_PORT=27017
   MONGO_DB=oauth-demo

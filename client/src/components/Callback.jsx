@@ -9,27 +9,29 @@ function Callback(props) {
   const location = useLocation();
 
   useEffect(() => {
-    const values = queryString.parse(location.search)
-    console.log("===> call back values:", values);
-    if (values.code) {
-      axios.post('http://localhost:7000/login/github', JSON.stringify({
-        code: values.code
-      }), {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-      })
-      .then(function (response) {
-        console.log("=> backend /login/github:", response);
+    async function exchangeToken() {
+      try {
+        const resp = await axios.post('http://localhost:7000/login/github', JSON.stringify({
+          code: values.code
+        }), {
+          headers: {
+              'Content-Type': 'application/json',
+          }
+        });
         dispatch({
           type: "LOGIN",
-          payload: { token: response.data.token }
+          payload: { token: resp.data.token }
         });
         props.history.push("/");
-      })
-      .catch(function (error) {
+      } catch (error) {
         console.log("=> backend error /login/github:", error);
-      });
+        throw error;
+      }
+    }
+
+    const values = queryString.parse(location.search)
+    if (values.code) {
+      exchangeToken();
     }
   }, [dispatch, location, props.history]);
 

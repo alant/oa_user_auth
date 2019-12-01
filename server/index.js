@@ -14,9 +14,7 @@ const port = 7000;
 const GRAPH_API_VERSION = "v5.0";
 
 const cors_whitelist = [
-  process.env.APP_URL,
-  process.env.APP_URL2,
-  process.env.APP_URL3
+  process.env.APP_URL
 ];
 const corsOptions = {
   origin: function (origin, callback) {
@@ -63,6 +61,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const loginWithGithub = async (req, res, next) => {
   try {
+    // exchange "code" for a access token which never expire as of 201912
     const atoken_resp = await axios.post('https://github.com/login/oauth/access_token',
       {
         client_id: process.env.GITHUB_CLIENT_ID,
@@ -86,7 +85,9 @@ const loginWithGithub = async (req, res, next) => {
         'User-Agent': 'smartshoppinglist'
       }
     });
+
     req.email = email_resp.data[0].email;
+
     let profile = {
       email: email_resp.data[0].email,
       id: user_resp.data.id,
@@ -99,7 +100,6 @@ const loginWithGithub = async (req, res, next) => {
     console.log("====> github err: ", err);
     res.status(500).send({ auth: false, message: 'Failed to auth through github.' });
   }
-
   next();
 }
 
@@ -118,7 +118,7 @@ app.post('/login/github', loginWithGithub, issueJwt, (req, res) => {});
 
 const loginWithFacebook = async (req, res, next) => {
   try {
-    // exchange short term access token for a longlived token, get user's name and email, upsert, return jwt token
+    // exchange short term access token for a longlived token
     const token_resp = await axios.get(`https://graph.facebook.com/${GRAPH_API_VERSION}/oauth/access_token`, {
       params: {
         grant_type: "fb_exchange_token",         
@@ -126,7 +126,6 @@ const loginWithFacebook = async (req, res, next) => {
         client_secret: process.env.FACEBOOK_APP_SECRET,
         fb_exchange_token: req.body.access_token }
     });
-
     const longlived_token = token_resp.data.access_token;
     
     const user_resp = await axios.get(`https://graph.facebook.com/${GRAPH_API_VERSION}/me`, {
@@ -135,8 +134,9 @@ const loginWithFacebook = async (req, res, next) => {
         access_token: longlived_token
       }
     });
+
     req.email = user_resp.data.email
-    // console.log("==> /login/facebook resp:", user_resp.data);
+
     let profile = {
       email: user_resp.data.email,
       id: user_resp.data.id,
