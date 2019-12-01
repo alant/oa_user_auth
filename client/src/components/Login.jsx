@@ -26,7 +26,7 @@ function Login(props) {
       );
       dispatch({
         type: "LOGIN",
-        payload: {token: resp.data.token, method: "FACEBOOK"}
+        payload: { token: resp.data.token }
       });
       props.history.push("/");
     } catch(error) {
