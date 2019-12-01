@@ -1,11 +1,11 @@
 import React, { useEffect }  from "react";
 import { AuthContext } from "../App";
 import axios from 'axios';
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 
-function Home(props) {
+function Home() {
   const { dispatch, state } = React.useContext(AuthContext);
-  const location = useLocation();
+  // const location = useLocation();
 
   useEffect(() => {
     async function fetchUser() {
@@ -29,7 +29,7 @@ function Home(props) {
     if (state.isAuthenticated) {
       fetchUser();
     }
-  }, [props.history, state.token, state.isAuthenticated, dispatch, location]);
+  }, [state.token, state.isAuthenticated, dispatch]);
 
   return (
     <div>
