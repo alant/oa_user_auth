@@ -22,7 +22,6 @@ const cors_whitelist = [
 ];
 const corsOptions = {
   origin: function (origin, callback) {
-    // console.log("=> origin: ", origin);
       if (cors_whitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -64,9 +63,7 @@ app.get("/profile", authCheck, async (req, res) => {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/login/github', async (req, res) => {  
-  const access_code = req.body.code;
-  console.log("==> /login/github body:", req.body, "code: ", access_code);
+const loginWithGithub = async (req, res, next) => {
   try {
     const atoken_resp = await axios.post('https://github.com/login/oauth/access_token',
       {
@@ -76,31 +73,22 @@ app.post('/login/github', async (req, res) => {
       }
     );
     const parsed = queryString.parse(atoken_resp.data);
-    console.log("=> parsed access_tokeng: ", parsed.access_token);
     const access_token = parsed.access_token;
 
     const user_resp = await axios.get('https://api.github.com/user', {
-        headers: {
-          'Authorization': "bearer " + access_token,
-          'User-Agent': 'smartshoppinglist'
-        }
+      headers: {
+        'Authorization': "bearer " + access_token,
+        'User-Agent': 'smartshoppinglist'
+      }
     });
 
     const email_resp = await axios.get('https://api.github.com/user/public_emails', {
-        headers: {
-          'Authorization': "bearer " + access_token,
-          'User-Agent': 'smartshoppinglist'
-        }
+      headers: {
+        'Authorization': "bearer " + access_token,
+        'User-Agent': 'smartshoppinglist'
+      }
     });
-    
-    let jwt_token = jwt.sign({ email: email_resp.data[0].email },
-      process.env.JWT_SECRET, 
-      { expiresIn: 30 * 24 * 60 * 60 }// expires in 30 days
-    );
-    res.json({
-        token: jwt_token
-    });
-
+    req.email = email_resp.data[0].email;
     let profile = {
       email: email_resp.data[0].email,
       id: user_resp.data.id,
@@ -113,11 +101,24 @@ app.post('/login/github', async (req, res) => {
     console.log("====> github err: ", err);
     res.status(500).send({ auth: false, message: 'Failed to auth through github.' });
   }
-});
 
-app.post('/login/facebook', async (req, res) => {  
-  const access_token = req.body.access_token;
-  let email;
+  next();
+}
+
+const issueJwt = function (req, res, next) {
+  let jwt_token = jwt.sign({ email: req.email },
+    process.env.JWT_SECRET, 
+    { expiresIn: 30 * 24 * 60 * 60 }// expires in 30 days
+  );
+  res.json({
+    token: jwt_token
+  });
+  next();
+}
+
+app.post('/login/github', loginWithGithub, issueJwt, (req, res) => {});
+
+const loginWithFacebook = async (req, res, next) => {
   try {
     // exchange short term access token for a longlived token, get user's name and email, upsert, return jwt token
     const token_resp = await axios.get(`https://graph.facebook.com/${GRAPH_API_VERSION}/oauth/access_token`, {
@@ -125,7 +126,7 @@ app.post('/login/facebook', async (req, res) => {
         grant_type: "fb_exchange_token",         
         client_id: process.env.FACEBOOK_APP_ID,
         client_secret: process.env.FACEBOOK_APP_SECRET,
-        fb_exchange_token: access_token }
+        fb_exchange_token: req.body.access_token }
     });
 
     const longlived_token = token_resp.data.access_token;
@@ -136,9 +137,8 @@ app.post('/login/facebook', async (req, res) => {
         access_token: longlived_token
       }
     });
-    email = user_resp.data.email
+    req.email = user_resp.data.email
     // console.log("==> /login/facebook resp:", user_resp.data);
-
     let profile = {
       email: user_resp.data.email,
       id: user_resp.data.id,
@@ -146,19 +146,14 @@ app.post('/login/facebook', async (req, res) => {
       avatar_url: user_resp.data.picture.data.url
     };
 
-    await User.upsertFacebookUser(access_token, profile);
+    await User.upsertFacebookUser(longlived_token, profile);
   } catch (err) {
     console.log("====> facebook err: ", err);
     res.status(500).send({ auth: false, message: 'Failed to auth through facebook.' });
   }
+  next();
+}
 
-  let jwt_token = jwt.sign({ email: email },
-    process.env.JWT_SECRET, 
-    { expiresIn: 30 * 24 * 60 * 60 }// expires in 30 days
-  );
-  res.json({
-      token: jwt_token
-  });
-});
+app.post('/login/facebook', loginWithFacebook, issueJwt, (req, res) => {});
 
 app.listen(port, () => console.log(`Server is running on port ${port}!`));
