@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect } from 'react';
 import Header from "./components/Header";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
@@ -6,7 +6,7 @@ import Login from "./components/Login";
 import Callback from "./components/Callback";
 import Privacy from "./components/Privacy";
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
-// import { StateInspector, useReducer } from "reinspect";
+import { useReducer } from "reinspect";
 
 export const AuthContext = React.createContext();
 
@@ -50,8 +50,8 @@ const reducer = (state, action) => {
   }
 };
 function App() {
-  const [state, dispatch] = useReducer(reducer, initialState);
-
+  // const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState, (state => state), "appReducer");
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
