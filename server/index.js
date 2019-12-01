@@ -2,8 +2,6 @@ require('dotenv').config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const cookieSession = require("cookie-session");
-const cookieParser = require("cookie-parser"); // parse cookie header
 const mongoose = require('./mongoose');
 mongoose();
 const User = require('mongoose').model('User');
