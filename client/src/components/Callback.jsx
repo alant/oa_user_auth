@@ -11,7 +11,7 @@ function Callback(props) {
   useEffect(() => {
     async function exchangeToken() {
       try {
-        const resp = await axios.post('http://localhost:7000/login/github', JSON.stringify({
+        const resp = await axios.post(process.env.REACT_APP_BACKEND_URL + '/login/github', JSON.stringify({
           code: values.code
         }), {
           headers: {

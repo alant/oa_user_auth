@@ -8,7 +8,7 @@ function Login(props) {
   const { state, dispatch } = React.useContext(AuthContext);
 
   const GITHUB_CLIENT_ID = "6e0b5f325ac2e324312c";
-  const GITHUB_REDIRECT_URI = process.env.REACT_APP_APP_URL + "/callback";
+  const GITHUB_REDIRECT_URI = process.env.REACT_APP_FRONTEND_URL + "/callback";
 
   const FACEBOOK_APP_ID = "1668438256731685";
 

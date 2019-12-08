@@ -11,7 +11,8 @@ Interesting interview take home challenge. So far it supports github and faceboo
   .env.development.local in client dir, note that react requires envionrment var to start with REACT_APP_ to be able to access it. for example:
 
   ```
-  REACT_APP_APP_URL=https://localhost:3000
+  REACT_APP_FRONTEND_URL=https://localhost:3000
+  REACT_APP_BACKEND_URL=http://localhost:7000
   ```
 
   .env in server dir, you need to replace "changeit" below with your actual credentials on corresponding oauth provider platform:

@@ -95,7 +95,7 @@ const loginWithGithub = async (req, res, next) => {
       avatar_url: user_resp.data.avatar_url
     };
 
-    await User.upsertGithubUser(access_token, profile);
+    await User.upsertGithubUser(profile);
   } catch (err) {
     console.log("====> github err: ", err);
     res.status(500).send({ auth: false, message: 'Failed to auth through github.' });
@@ -117,21 +117,11 @@ const issueJwt = function (req, res, next) {
 app.post('/login/github', loginWithGithub, issueJwt, (req, res) => {});
 
 const loginWithFacebook = async (req, res, next) => {
-  try {
-    // exchange short term access token for a longlived token
-    const token_resp = await axios.get(`https://graph.facebook.com/${GRAPH_API_VERSION}/oauth/access_token`, {
-      params: {
-        grant_type: "fb_exchange_token",         
-        client_id: process.env.FACEBOOK_APP_ID,
-        client_secret: process.env.FACEBOOK_APP_SECRET,
-        fb_exchange_token: req.body.access_token }
-    });
-    const longlived_token = token_resp.data.access_token;
-    
+  try { 
     const user_resp = await axios.get(`https://graph.facebook.com/${GRAPH_API_VERSION}/me`, {
       params: {
         fields: "id, name, email, picture",
-        access_token: longlived_token
+        access_token: req.body.access_token
       }
     });
 
@@ -144,7 +134,7 @@ const loginWithFacebook = async (req, res, next) => {
       avatar_url: user_resp.data.picture.data.url
     };
 
-    await User.upsertFacebookUser(longlived_token, profile);
+    await User.upsertFacebookUser(profile);
   } catch (err) {
     console.log("====> facebook err: ", err);
     res.status(500).send({ auth: false, message: 'Failed to auth through facebook.' });

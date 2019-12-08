@@ -30,16 +30,14 @@ module.exports = async function () {
     facebookProvider: {
       type: {
         id: String,
-        avatar_url: String,
-        access_token: String
+        avatar_url: String
       },
       select: false
     },
     githubProvider: {
       type: {
         id: String,
-        avatar_url: String,
-        access_token: String
+        avatar_url: String
       },
       select: false
     }
@@ -47,15 +45,14 @@ module.exports = async function () {
 
   UserSchema.set('toJSON', {getters: true, virtuals: true});
 
-  UserSchema.statics.upsertGithubUser = async function(accessToken, profile) {
+  UserSchema.statics.upsertGithubUser = async function(profile) {
     const filter = { 'email': profile.email };
     const update = {  
       email: profile.email,
       name: profile.name,
       githubProvider: {
         id: profile.id,
-        avatar_url: profile.avatar_url,
-        access_token: accessToken
+        avatar_url: profile.avatar_url
       } 
     };
     try {
@@ -70,15 +67,14 @@ module.exports = async function () {
     }
   };
 
-  UserSchema.statics.upsertFacebookUser = async function(accessToken, profile) {
+  UserSchema.statics.upsertFacebookUser = async function(profile) {
     const filter = { 'email': profile.email };
     const update = {  
       email: profile.email,
       name: profile.name,
       facebookProvider: {
         id: profile.id,
-        avatar_url: profile.avatar_url,
-        access_token: accessToken
+        avatar_url: profile.avatar_url
       } 
     };
     try {
